@@ -1,0 +1,58 @@
+{
+  "name": "homebridge-ondilo-ico",
+  "version": "0.5.1",
+  "description": "Plugin Homebridge pour Ondilo ICO - suivi de piscine et spa (FR/EN). Plugin Homebridge for Ondilo ICO pool and spa monitoring.",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge",
+    "ondilo",
+    "ico",
+    "pool",
+    "spa",
+    "homekit",
+    "piscine",
+    "jacuzzi",
+    "monitoring"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mashgundash/homebridge-ondilo-ico.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mashgundash/homebridge-ondilo-ico/issues"
+  },
+  "homepage": "https://github.com/mashgundash/homebridge-ondilo-ico#readme",
+  "changelog": "https://github.com/mashgundash/homebridge-ondilo-ico/releases",
+  "funding": {
+    "type": "paypal",
+    "url": "https://paypal.me/mashgundash"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "homebridge": ">=1.6.0"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "api.js",
+    "config.schema.json",
+    "index.js",
+    "oauth-helper.js",
+    "platform.js"
+  ],
+  "dependencies": {
+    "axios": "^1.7.2",
+    "axios-retry": "^3.9.1",
+    "qs": "^6.12.1"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "scripts": {},
+  "author": {
+    "name": "Mash Media",
+    "email": "regis.jehl@cleanrider.com"
+  }
+}

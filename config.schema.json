@@ -1,0 +1,89 @@
+{
+  "pluginAlias": "OndiloICO",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Ondilo ICO (lecture des mesures). Fournissez un refresh_token via l'assistant OAuth (npm run oauth).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "default": "Ondilo ICO"
+      },
+      "refreshToken": {
+        "type": "string",
+        "title": "Refresh token OAuth2",
+        "required": true
+      },
+      "poolId": {
+        "type": "number",
+        "title": "ID de la piscine/spa (facultatif)"
+      },
+      "measures": {
+        "type": "array",
+        "title": "Mesures \u00e0 exposer",
+        "items": {
+          "type": "string",
+          "enum": [
+            "temperature",
+            "ph",
+            "orp",
+            "salt",
+            "tds",
+            "battery",
+            "rssi"
+          ]
+        },
+        "default": [
+          "temperature",
+          "ph",
+          "orp",
+          "battery"
+        ]
+      },
+      "phService": {
+        "type": "string",
+        "title": "Service HomeKit pour le pH",
+        "enum": [
+          "light",
+          "humidity"
+        ],
+        "default": "light"
+      },
+      "orpService": {
+        "type": "string",
+        "title": "Service HomeKit pour l'ORP",
+        "enum": [
+          "light",
+          "humidity"
+        ],
+        "default": "light"
+      },
+      "updateInterval": {
+        "type": "integer",
+        "title": "Intervalle de mise \u00e0 jour (secondes)",
+        "default": 3600,
+        "minimum": 600
+      },
+      "useMeasuresFallback": {
+        "type": "boolean",
+        "title": "Forcer le fallback /measures si /lastmeasures est vide",
+        "default": true
+      },
+      "childBridge": {
+        "type": "boolean",
+        "title": "Ex\u00e9cuter ce plugin dans un bridge enfant",
+        "default": true
+      },
+      "logLevel": {
+        "type": "string",
+        "title": "Niveau de log",
+        "enum": [
+          "info",
+          "debug"
+        ],
+        "default": "info"
+      }
+    }
+  }
+}
