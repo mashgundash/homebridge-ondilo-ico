@@ -179,8 +179,9 @@ Une seconde relecture, conduite par un moteur tiers avec exécution des scénari
 
 - `engines` : Node 22 ou 24, Homebridge 1.8 ou 2.
 - Schéma de réglages entièrement réécrit — champs obligatoires réellement déclarés, jeton masqué,
-  libellés et descriptions sur chaque champ, bornes cohérentes. Le schéma racine passe en anglais,
-  la traduction française est servie automatiquement depuis `schemas/`.
+  libellés et descriptions sur chaque champ, bornes cohérentes. Le schéma est en anglais :
+  l'interface Homebridge ne rend que le `config.schema.json` racine et n'a aucun mécanisme de
+  schéma multilingue. La documentation française est dans `README.fr.md`.
 - Options mortes retirées : `childBridge` (Homebridge gère les bridges enfants par `_bridge`).
 - `axios-retry` et `qs`, déclarés mais jamais utilisés, sont retirés des dépendances.
 - README anglais et français reconstruits, avec le tableau des services HomeKit et le dépannage.
@@ -268,8 +269,9 @@ locked against stale state and double submission, the log-level option now reach
 diagnostic, and the OAuth helper authenticates `state` before anything else.
 
 **Packaging** — Node 22/24 and Homebridge 1.8/2; settings schema fully rewritten with real required
-fields, a masked token, labels, descriptions and sane bounds; English root schema with an automatic
-French translation from `schemas/`; the dead `childBridge` option removed; unused `axios-retry` and
+fields, a masked token, labels, descriptions and sane bounds; the schema is in English, since the Homebridge
+interface only renders the root `config.schema.json` and has no multilingual mechanism (French
+documentation lives in `README.fr.md`); the dead `childBridge` option removed; unused `axios-retry` and
 `qs` dependencies dropped; English and French READMEs rebuilt.
 
 **Tests** — the plugin had none; it now ships 169, run by `npm test` (`node --test`, no dev
