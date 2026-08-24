@@ -2,87 +2,138 @@
   "pluginAlias": "OndiloICO",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Ondilo ICO (lecture des mesures). Fournissez un refresh_token via l'assistant OAuth (npm run oauth).",
+  "headerDisplay": "Publishes the measurements of an **Ondilo ICO** pool or spa probe in Apple Home. You need an OAuth refresh token: run `npm run oauth` from the plugin folder (see the README for the exact command on a hb-service installation), then paste the token below.",
+  "footerDisplay": "Apple Home has no pH or ORP sensor: those values are carried by a light sensor, plus a plugin-specific characteristic that Eve, Controller for HomeKit and Home+ display with the right unit. Ondilo allows 30 API calls per hour — the plugin stays well under that limit.",
   "schema": {
     "type": "object",
+    "required": ["name", "refreshToken"],
     "properties": {
       "name": {
         "type": "string",
+        "title": "Name",
+        "description": "Label used in the Homebridge log.",
         "default": "Ondilo ICO"
       },
       "refreshToken": {
         "type": "string",
-        "title": "Refresh token OAuth2",
-        "required": true
+        "title": "Refresh token",
+        "description": "OAuth2 refresh token returned by `npm run oauth`. Ondilo does not rotate it and does not expire it.",
+        "x-schema-form": {
+          "type": "password"
+        }
       },
       "poolId": {
         "type": "number",
-        "title": "ID de la piscine/spa (facultatif)"
+        "title": "Pool identifier",
+        "description": "Optional. Leave empty to keep the pool that is already paired, or the first pool of the account on a fresh install. If the value does not match any pool, the plugin logs every available identifier and creates nothing rather than silently falling back."
+      },
+      "layout": {
+        "type": "string",
+        "title": "Accessory layout",
+        "default": "legacy",
+        "description": "Legacy keeps the historical behaviour: one accessory, identical HomeKit identifier, no re-pairing. Grouped exposes every pool of the account and takes the serial number from the probe instead of the pool identifier.",
+        "oneOf": [
+          { "title": "Legacy — one accessory, pairing unchanged", "enum": ["legacy"] },
+          { "title": "Grouped — every pool of the account, unless a pool identifier is set below", "enum": ["grouped"] }
+        ]
       },
       "measures": {
         "type": "array",
-        "title": "Mesures \u00e0 exposer",
+        "title": "Measurements to expose",
+        "minItems": 1,
+        "description": "Salinity is only produced by salt pools and TDS only by the others: the plugin asks for whichever one matches the disinfection declared in your Ondilo account and skips the other.",
+        "default": ["temperature", "ph", "orp", "battery"],
         "items": {
           "type": "string",
-          "enum": [
-            "temperature",
-            "ph",
-            "orp",
-            "salt",
-            "tds",
-            "battery",
-            "rssi"
+          "enum": ["temperature", "ph", "orp", "salt", "tds", "battery", "rssi"],
+          "enumNames": [
+            "Water temperature",
+            "pH",
+            "ORP (redox)",
+            "Salinity (salt pools)",
+            "TDS (non-salt pools)",
+            "Probe battery",
+            "Radio signal"
           ]
-        },
-        "default": [
-          "temperature",
-          "ph",
-          "orp",
-          "battery"
-        ]
+        }
       },
       "phService": {
         "type": "string",
-        "title": "Service HomeKit pour le pH",
-        "enum": [
-          "light",
-          "humidity"
-        ],
-        "default": "light"
+        "title": "HomeKit service used for pH",
+        "default": "light",
+        "oneOf": [
+          { "title": "Light sensor — pH scaled to lux (recommended)", "enum": ["light"] },
+          { "title": "Humidity sensor — pH shown as a percentage of 0-14", "enum": ["humidity"] }
+        ]
+      },
+      "phLuxScale": {
+        "type": "integer",
+        "title": "pH scale factor",
+        "default": 100,
+        "description": "Apple Home rounds light levels to whole numbers, so a raw pH collapses the useful 6.8-8.2 range onto two values. Keep 100 unless an existing automation reads the raw number.",
+        "oneOf": [
+          { "title": "pH x100 — 7.24 shows as 724 lx (recommended)", "enum": [100] },
+          { "title": "Raw pH — 7.24 shows as 7 lx (0.x behaviour)", "enum": [1] }
+        ]
       },
       "orpService": {
         "type": "string",
-        "title": "Service HomeKit pour l'ORP",
-        "enum": [
-          "light",
-          "humidity"
-        ],
-        "default": "light"
+        "title": "HomeKit service used for ORP",
+        "default": "light",
+        "oneOf": [
+          { "title": "Light sensor — millivolts shown as lux (recommended)", "enum": ["light"] },
+          { "title": "Humidity sensor — percentage of a 1200 mV full scale", "enum": ["humidity"] }
+        ]
       },
       "updateInterval": {
         "type": "integer",
-        "title": "Intervalle de mise \u00e0 jour (secondes)",
+        "title": "Refresh interval (seconds)",
         "default": 3600,
-        "minimum": 600
+        "minimum": 1800,
+        "maximum": 21600,
+        "description": "The ICO probe only takes one measurement per hour and Ondilo caps the API at 30 calls per hour, so there is nothing to gain below 1800 s. Up to 3900 s the plugin also aligns itself on the timestamp of the last measurement, so the value is fresher at the same call count; above that it simply waits the interval you asked for."
       },
       "useMeasuresFallback": {
         "type": "boolean",
-        "title": "Forcer le fallback /measures si /lastmeasures est vide",
-        "default": true
+        "title": "Recover missing values from the 24-hour history",
+        "default": true,
+        "description": "When a measurement is missing from the live reading, fetch the last valid point of the day for it. Limited to two measurements per cycle to stay inside the API quota."
       },
-      "childBridge": {
+      "waterQuality": {
         "type": "boolean",
-        "title": "Ex\u00e9cuter ce plugin dans un bridge enfant",
-        "default": true
+        "title": "Add a water quality tile",
+        "default": true,
+        "description": "Air quality sensor showing Excellent / Fair / Poor, computed from the target ranges you set in the Ondilo app. This is the only tile Apple Home labels with words instead of a bare number. It reports Unknown rather than Excellent while a measurement is missing or stale."
+      },
+      "outOfRangeSensors": {
+        "type": "boolean",
+        "title": "Add one out-of-range contact sensor per measurement",
+        "default": false,
+        "description": "Creates an extra tile per measurement, openable as an automation trigger. Off by default because it adds several tiles to the accessory."
+      },
+      "recommendations": {
+        "type": "boolean",
+        "title": "Expose Ondilo recommendations",
+        "default": false,
+        "description": "Contact sensor that opens while Ondilo has a pending recommendation (clean the filter, add product...). Costs one extra API call per cycle."
+      },
+      "allowRecommendationValidation": {
+        "type": "boolean",
+        "title": "Allow marking a recommendation as done from HomeKit",
+        "default": false,
+        "description": "Adds a switch that validates the pending recommendation on your Ondilo account when you turn it off. This is the only write this plugin can perform, and an accidental tap cannot be undone. Requires the option above.",
+        "condition": {
+          "functionBody": "return model.recommendations === true;"
+        }
       },
       "logLevel": {
         "type": "string",
-        "title": "Niveau de log",
-        "enum": [
-          "info",
-          "debug"
-        ],
-        "default": "info"
+        "title": "Log level",
+        "default": "info",
+        "oneOf": [
+          { "title": "Normal", "enum": ["info"] },
+          { "title": "Detailed — diagnostic messages promoted to the main log", "enum": ["debug"] }
+        ]
       }
     }
   }

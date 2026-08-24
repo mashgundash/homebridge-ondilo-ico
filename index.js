@@ -1,8 +1,7 @@
-
 'use strict';
 
-const { OndiloIcoPlatform } = require('./platform');
+const { OndiloIcoPlatform, PLATFORM_NAME } = require('./platform');
 
 module.exports = (api) => {
-  api.registerPlatform('OndiloICO', OndiloIcoPlatform);
+  api.registerPlatform(PLATFORM_NAME, OndiloIcoPlatform);
 };
