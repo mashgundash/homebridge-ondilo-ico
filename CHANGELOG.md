@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.1 - 2026-08-25
+
+### Corrigé
+
+- **Le plugin ne se déclare plus incompatible avec Matter.** Le mot-clé
+  `supports-hap` était posé seul. L'interface Homebridge traite toute
+  déclaration de transport comme complète : déclarer HAP seul revenait donc à
+  affirmer que le plugin ne fait pas de Matter, ce qui est faux — Homebridge 2.x
+  passe les accessoires HAP vers Matter sans que le plugin intervienne. Les deux
+  mots-clés de transport sont désormais absents, ce qui laisse le plugin neutre
+  et toujours traité comme HAP. Le fonctionnement est inchangé.
+
 ## 1.0.0 - 2026-08-24
 
 Première version majeure. Aucun réappairage : l'identifiant HomeKit de l'accessoire

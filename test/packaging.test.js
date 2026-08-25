@@ -106,8 +106,12 @@ test('aucun secret ni jeton n\'est écrit en dur', () => {
 // package.json.
 // ---------------------------------------------------------------------------
 
-test('la version publiée est bien 1.0.0', () => {
-  assert.equal(pkg.version, '1.0.0');
+// Figer le numéro obligerait à retoucher ce test à chaque publication sans rien prouver.
+// Ce qui compte, c'est qu'une version publiée soit décrite quelque part.
+test('la version du paquet a son entrée de changelog', () => {
+  assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
+  const changelog = fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8');
+  assert.ok(changelog.includes(`## ${pkg.version} `), `aucune entrée de changelog pour ${pkg.version}`);
 });
 
 test('le paquet cible Node 22 et 24, Homebridge 1.8 et 2 y compris ses préversions', () => {
@@ -116,8 +120,15 @@ test('le paquet cible Node 22 et 24, Homebridge 1.8 et 2 y compris ses préversi
 });
 
 test('les mots-clés exigés par Homebridge sont présents', () => {
-  for (const keyword of ['homebridge-plugin', 'supports-hap']) {
-    assert.ok(pkg.keywords.includes(keyword), `mot-clé ${keyword} manquant`);
+  assert.ok(pkg.keywords.includes('homebridge-plugin'), 'mot-clé homebridge-plugin manquant');
+});
+
+// Déclarer un transport revient à les déclarer TOUS : `supports-hap` seul fait afficher le
+// plugin comme incompatible Matter, alors que Homebridge y passe les accessoires HAP de
+// lui-même. N'en déclarer aucun laisse le plugin neutre, et traité comme HAP.
+test('aucun mot-clé de transport n\'est déclaré', () => {
+  for (const keyword of ['supports-hap', 'supports-matter']) {
+    assert.ok(!pkg.keywords.includes(keyword), `mot-clé ${keyword} à retirer`);
   }
 });
 
