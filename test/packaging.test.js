@@ -123,13 +123,12 @@ test('les mots-clés exigés par Homebridge sont présents', () => {
   assert.ok(pkg.keywords.includes('homebridge-plugin'), 'mot-clé homebridge-plugin manquant');
 });
 
-// Déclarer un transport revient à les déclarer TOUS : `supports-hap` seul fait afficher le
-// plugin comme incompatible Matter, alors que Homebridge y passe les accessoires HAP de
-// lui-même. N'en déclarer aucun laisse le plugin neutre, et traité comme HAP.
-test('aucun mot-clé de transport n\'est déclaré', () => {
-  for (const keyword of ['supports-hap', 'supports-matter']) {
-    assert.ok(!pkg.keywords.includes(keyword), `mot-clé ${keyword} à retirer`);
-  }
+// Le robot de vérification exige au moins un transport déclaré. `supports-matter` est réservé
+// aux plugins qui enregistrent eux-mêmes des accessoires Matter : le déclarer ici serait faux,
+// et sans `supports-hap` il ferait créer les child bridges avec HAP désactivé.
+test('un transport est déclaré, et c\'est HAP seul', () => {
+  assert.ok(pkg.keywords.includes('supports-hap'), 'supports-hap exigé par la vérification');
+  assert.ok(!pkg.keywords.includes('supports-matter'), 'le plugin n\'enregistre pas d\'accessoires Matter');
 });
 
 test('la commande npm run oauth existe vraiment', () => {

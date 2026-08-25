@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.2 - 2026-08-25
+
+### Corrigé
+
+- **Le mot-clé `supports-hap` est rétabli.** Il avait été retiré à la version
+  précédente, sur l'idée erronée que le déclarer seul signalait le plugin comme
+  incompatible avec Matter. Ce n'est pas le cas : il signifie simplement qu'aucun
+  badge Matter n'est affiché, ce qui est correct ici — Homebridge passe les
+  accessoires HAP vers Matter de lui-même, et `supports-matter` est réservé aux
+  plugins qui enregistrent leurs propres accessoires Matter. La vérification exige
+  par ailleurs au moins un mot-clé de transport : le retirer cassait ce contrôle.
+  Aucun changement fonctionnel.
+
 ## 1.0.1 - 2026-08-25
 
 ### Corrigé

@@ -1,12 +1,13 @@
 {
   "name": "homebridge-ondilo-ico",
   "displayName": "Ondilo ICO",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Homebridge plugin for the Ondilo ICO pool and spa probe: temperature, pH, ORP, salinity and battery in Apple Home.",
   "main": "index.js",
   "license": "MIT",
   "keywords": [
     "homebridge-plugin",
+    "supports-hap",
     "homebridge",
     "homekit",
     "ondilo",
